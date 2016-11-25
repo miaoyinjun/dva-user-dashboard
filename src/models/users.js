@@ -1,3 +1,5 @@
+import { query } from '../services/users';
+
 export default {
   namespace: 'users',
 
@@ -15,50 +17,40 @@ export default {
       history.listen(location => {
         if (location.pathname === '/users') {
           dispatch({
-            type: 'querySuccess',
-            payload: {},
+            type: 'query',
+            payload: location.query,
           });
         }
       });
     },
   },
   effects: {
-    *query() { },
+    *query({ payload }, { select, call, put }) {
+      yield put({ type: 'showLoading' });
+      const { data } = yield call(query);
+      if (data) {
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            list: data.data,
+            total: data.page.total,
+            current: data.page.current,
+          },
+        });
+      }
+    },
     *create() { },
     *'delete'() { },
     *update() { },
   },
   reducers: {
-    showLoading() { }, // 控制加载状态的 reducer
+    showLoading(state, action) {
+      return { ...state, loading: true };
+    },
     showModal() { }, // 控制 Modal 显示状态的 reducer
     hideModal() { },
-    querySuccess(state) {
-      const mock = {
-        total: 3,
-        current: 1,
-        loading: false,
-        list: [
-          {
-            id: 1,
-            name: '张三',
-            age: 23,
-            address: '成都',
-          },
-          {
-            id: 2,
-            name: '李四',
-            age: 24,
-            address: '杭州',
-          },
-          {
-            id: 3,
-            name: '王五',
-            age: 25,
-            address: '上海',
-          },
-        ],
-      };
-      return { ...state, ...mock, loading: false };
+    querySuccess(state, action) {
+      return { ...state, ...action.payload, loading: false };
     },
     createSuccess() { },
     deleteSuccess() { },
