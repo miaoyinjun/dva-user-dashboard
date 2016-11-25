@@ -1,8 +1,33 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'dva';
 
-const Users = props => {
+import UserList from '../components/Users/UserList';
+import UserSearch from '../components/Users/UserSearch';
+import UserModal from '../components/Users/UserModal';
+
+import styles from './Users.css';
+
+const Users = ({ location, dispatch, users }) => {
+  const {
+    loading, list, total, current,
+    currentItem, modalVisible, modalType,
+  } = users;
+
+  const userSearchProps = {};
+  const userListProps = {
+    dataSource: list,
+    total,
+    loading,
+    current,
+  };
+  const userModalProps = {};
+
   return (
-    <div><h1>Yay! Welcome to dva!</h1></div>
+    <div className={styles.normal}>
+      <UserSearch {...userSearchProps} />
+      <UserList {...userListProps} />
+      <UserModal {...userModalProps} />
+    </div>
   );
 };
 
@@ -10,4 +35,8 @@ Users.propTypes = {
 
 };
 
-export default Users;
+function mapStateToProps({ users }) {
+  return { users };
+}
+
+export default connect(mapStateToProps)(Users);
