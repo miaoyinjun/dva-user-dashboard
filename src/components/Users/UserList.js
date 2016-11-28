@@ -1,9 +1,12 @@
 import React, { PropTypes } from 'react';
+import { Table, Popconfirm, Pagination } from 'antd';
 
-// 采用antd的UI组件
-import { Table, message, Popconfirm } from 'antd';
-
-const UserList = ({ total, current, loading, dataSource }) => {
+function UserList({
+  total, current, loading, dataSource,
+  onPageChange,
+  onDeleteItem,
+  onEditItem,
+  }) {
   const columns = [{
     title: '姓名',
     dataIndex: 'name',
@@ -22,21 +25,14 @@ const UserList = ({ total, current, loading, dataSource }) => {
     key: 'operation',
     render: (text, record) => (
       <p>
-        <a onClick={() => { } }>编辑</a>
+        <a onClick={() => onEditItem(record)}>编辑</a>
         &nbsp;
-        <Popconfirm title="确定要删除吗？" onConfirm={() => { } }>
+        <Popconfirm title="确定要删除吗？" onConfirm={() => onDeleteItem(record.id)}>
           <a>删除</a>
         </Popconfirm>
       </p>
     ),
   }];
-
-  const pagination = {
-    total,
-    current,
-    pageSize: 10,
-    onChange: () => { },
-  };
 
   return (
     <div>
@@ -45,14 +41,27 @@ const UserList = ({ total, current, loading, dataSource }) => {
         dataSource={dataSource}
         loading={loading}
         rowKey={record => record.id}
-        pagination={pagination}
+        pagination={false}
+      />
+      <Pagination
+        className="ant-table-pagination"
+        total={total}
+        current={current}
+        pageSize={10}
+        onChange={onPageChange}
       />
     </div>
   );
-};
+}
 
 UserList.propTypes = {
-
+  onPageChange: PropTypes.func,
+  onDeleteItem: PropTypes.func,
+  onEditItem: PropTypes.func,
+  dataSource: PropTypes.array,
+  loading: PropTypes.any,
+  total: PropTypes.any,
+  current: PropTypes.any,
 };
 
 export default UserList;
